@@ -66,6 +66,7 @@ Then we should test it and see that the behaviour works. Setting up backend test
 
 # Psuedo Code:
 
+```
 <template>
   <div class="bookshelf">
     <h2>{{ themeTitle }}</h2>
@@ -112,8 +113,9 @@ export default {
   }
 }
 </script>
+```
 
-
+```
 Endpoint: GET /books
 Query parameters:
 - theme: string
@@ -127,4 +129,4 @@ Response:
   ],
   nextCursor: string | null
 }
-
+```
