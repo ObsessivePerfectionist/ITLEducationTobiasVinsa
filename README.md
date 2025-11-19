@@ -61,3 +61,70 @@ Add some logging so that we see if any unexpected errors occur with reasons and 
 Then frontend should be built up like it looks in the screenshots with the addition that if someone clicks on the next button or the below screen one different cursors should be used to send a request to the backend.
 
 Then we should test it and see that the behaviour works. Setting up backend tests to test small business logic things. And for frontend check that it looks good.
+
+
+
+# Psuedo Code:
+
+<template>
+  <div class="bookshelf">
+    <h2>{{ themeTitle }}</h2>
+    <div class="books-grid">
+      <div v-for="book in books" :key="book.id" class="book-card">
+        {{ book.title }}
+      </div>
+    </div>
+    <button v-if="!finished && !loading" @click="loadBooks">Next</button>
+    <div v-if="loading">Loading...</div>
+    <div v-if="finished">You've reached the end.</div>
+  </div>
+</template>
+
+<script>
+export default {
+  props: ['themeTitle', 'themeKey'],
+  data() {
+    return {
+      books: [],
+      cursor: null,
+      loading: false,
+      finished: false
+    }
+  },
+  mounted() {
+    this.loadBooks()
+  },
+  methods: {
+    async loadBooks() {
+      if (this.loading || this.finished) return
+      this.loading = true
+
+      const response = await fetch(`/books?theme=${this.themeKey}&limit=30&cursor=${this.cursor || ''}`)
+      const data = await response.json()
+
+      this.books.push(...data.items)
+
+      this.cursor = data.nextCursor
+      if (!data.nextCursor) this.finished = true
+
+      this.loading = false
+    }
+  }
+}
+</script>
+
+
+Endpoint: GET /books
+Query parameters:
+- theme: string
+- limit: number
+- cursor: string (optional)
+
+Response:
+{
+  items: [
+    { id, title, theme, createdAt, bookGroupId }
+  ],
+  nextCursor: string | null
+}
+
